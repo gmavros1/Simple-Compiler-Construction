@@ -20,15 +20,14 @@ int line_num = 1;
 
 letter 	[A-Za-z]
 digit	[0-9]
-id	letter(letter|digit|'_')*
+id	[A-Za-z][A-Za-z0-9_]*
 num	[1-9]digit*('.'digit*)?
 string 	'(digit|letter)*'
-Empty 	[\t\r]|" "
-line	[\n]
+Empty 	[[:space:]]
 
 %%
 
-line		{ line_num++ ; }
+[\(\)\{\}] 	{ printf("Brackets or par ") ; return yytext[0] ; }
 
 "mainclass"	{ printf("MAINCLASS ") ; return  MAINCLASS ; }
 
@@ -70,13 +69,11 @@ line		{ line_num++ ; }
 
 {string}	{ printf("STRING ") ; return STRING ; }
 
-<<EOF>>		{ printf("EOF ") ; return EOF; }
-
-. 		{ printf(" %d \n", line_num); yyerror("lexical error"); exit(1); }
-
 {Empty}+	{ printf("EMPTY ") ; /* nothing */ }
 
-[\(\)\{\}] 	{ return yytext[0] ; }
+. 		{ printf(" lexical error \n "); exit(1); }
+
+<<EOF>>		{ printf("EOF ") ; return EOF; }
 
 
 %%

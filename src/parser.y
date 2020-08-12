@@ -16,19 +16,18 @@ void yyerror (char const *);
 %left '(' ')'
 %left '+' '-'
 %left '*' '/'
+%left '{' '}'
 
 %% 
 
-PROGRAM 	: MAINCLASS ID '{' PUBLIC STATIC VOID MAIN '(' ')' COMP_STMT '}'
+PROGRAM 	: MAINCLASS  ID  '{' PUBLIC STATIC VOID MAIN '(' ')' COMP_STMT '}'
 		;
 
-
-COMP_STMT 	: '{' STMT_LIST'}'
+COMP_STMT 	: '{' STMT_LIST '}'
 		;
 	
-
-STMT_LIST	: STMT_LIST STMT
-		| /* nothing */
+STMT_LIST	: /* nothing */
+		| STMT_LIST STMT
 		;
 
 STMT		: ASSIGN_STMT
@@ -68,12 +67,12 @@ EXPR		: ASSIGN_EXPR
 FOR_STMT 	: FOR '(' OPASSIGN_EXPR Q OPBOOL_EXPR Q OPASSIGN_EXPR ')' STMT
 		;
 
-OPASSIGN_EXPR	: ASSIGN_EXPR
-		| /* nothing */
+OPASSIGN_EXPR	: /* nothing */
+		| ASSIGN_EXPR
 		;
 
-OPBOOL_EXPR	: BOOL_EXPR
-		| /* nothing */
+OPBOOL_EXPR	: /* nothing */
+		| BOOL_EXPR
 		;
 
 WHILE_STMT	: WHILE '(' BOOL_EXPR ')' STMT
@@ -82,8 +81,8 @@ WHILE_STMT	: WHILE '(' BOOL_EXPR ')' STMT
 IF_STMT		: IF '(' BOOL_EXPR ')' STMT ELSE_PART
 		;
 
-ELSE_PART	: ELSE STMT
-		| /* nothing */
+ELSE_PART	: /* nothing */
+		| ELSE STMT
 		;
 
 BOOL_EXPR	: EXPR C_OP EXPR
