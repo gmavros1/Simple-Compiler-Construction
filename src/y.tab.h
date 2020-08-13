@@ -10,7 +10,6 @@
 #define WHILE 267
 #define IF 268
 #define ELSE 269
-#define Q 270
 #define ID 271
 #define NUM 272
 #define STRING 273

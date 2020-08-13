@@ -9,8 +9,6 @@
 int yylex();
 void yyerror(const char *s);
 
-int line_num = 1;
-
 #include "y.tab.h"
 #define T_eof	0
 %}
@@ -18,16 +16,16 @@ int line_num = 1;
 
 %option noyywrap 
 
-letter 	[A-Za-z]
-digit	[0-9]
+letter 	[[:alpha:]]
+digit	[[:digit:]]
 id	[A-Za-z][A-Za-z0-9_]*
-num	[1-9]digit*('.'digit*)?
+num	[1-9]digit*(.digit*)?|0(.digit*)?|1
 string 	'(digit|letter)*'
 Empty 	[[:space:]]
+punct	[[:punct:]]
 
 %%
 
-[\(\)\{\}] 	{ printf("Brackets or par ") ; return yytext[0] ; }
 
 "mainclass"	{ printf("MAINCLASS ") ; return  MAINCLASS ; }
 
@@ -53,8 +51,6 @@ Empty 	[[:space:]]
 
 "else"		{ printf("ELSE ") ; return ELSE ; }
 
-";"		{ printf("Q ") ; return Q ; } 
-
 "=="		{ printf("EQUAL ") ; return EQUAL ; }
 
 "<="		{ printf("SMALLER ") ; return SMALLER ; }
@@ -63,17 +59,18 @@ Empty 	[[:space:]]
 
 "!="		{ printf("NOTEQUAL ") ; return NOTEQUAL ; }
 
+{Empty}+	{ printf("EMPTY ") ; /* nothing */ }
+
 {id}		{ printf("ID ") ; return ID ; }
 
 {num}		{ printf("NUM ") ; return NUM ; }
 
 {string}	{ printf("STRING ") ; return STRING ; }
 
-{Empty}+	{ printf("EMPTY ") ; /* nothing */ }
-
-. 		{ printf(" lexical error \n "); exit(1); }
+{punct}  	{ printf("PUNCT ") ; return yytext[0] ; }
 
 <<EOF>>		{ printf("EOF ") ; return EOF; }
 
+. 		{ yyerror("lexical error"); exit(1); }
 
 %%
