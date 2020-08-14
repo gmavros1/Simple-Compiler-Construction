@@ -19,58 +19,57 @@ void yyerror(const char *s);
 letter 	[[:alpha:]]
 digit	[[:digit:]]
 id	[A-Za-z][A-Za-z0-9_]*
-num	[1-9]digit*(.digit*)?|0(.digit*)?|1
+num	[0-9]+"."[0-9]+|[0-9]+
 string 	'(digit|letter)*'
 Empty 	[[:space:]]
 punct	[[:punct:]]
 
 %%
 
+{Empty}+	{  /* nothing */ }
 
-"mainclass"	{ printf("MAINCLASS ") ; return  MAINCLASS ; }
+{punct}  	{ printf("\n %s \n", yytext) ; return yytext[0] ; }
 
-"public"	{ printf("PUBLIC ") ; return PUBLIC; }
+"mainclass"	{ return  T_MAINCLASS ; }
+
+"public"	{ return T_PUBLIC; }
 	
-"static"	{ printf("STATIC ") ; return STATIC ; }
+"static"	{ return T_STATIC ; }
 
-"void"		{ printf("VOID ") ; return VOID ; }
+"void"		{ return T_VOID ; }
 
-"main"		{ printf("MAIN ") ; return MAIN ; }
+"main"		{ return T_MAIN ; }
 
-"println"	{ printf("PRINTLN ") ; return PRINTLN ; }
+"println"	{ return T_PRINTLN ; }
 
-"int"		{ printf("INT ") ; return INT ; }
+"int"		{ return T_INT ; }
 
-"float"		{ printf("FLOAT ") ; return FLOAT ; }
+"float"		{ return T_FLOAT ; }
 
-"for"		{ printf("FOR ") ; return FOR ; }
+"for"		{ return T_FOR ; }
 
-"while"		{ printf("WHILE ") ; return WHILE ; }
+"while"		{ return T_WHILE ; }
 
-"if"		{ printf("IF ") ; return IF ; }
+"if"		{ return T_IF ; }
 
-"else"		{ printf("ELSE ") ; return ELSE ; }
+"else"		{ return T_ELSE ; }
 
-"=="		{ printf("EQUAL ") ; return EQUAL ; }
+"=="		{ return T_EQUAL ; }
 
-"<="		{ printf("SMALLER ") ; return SMALLER ; }
+"<="		{ return T_SMALLER ; }
 
-">="		{ printf("BIGGER ") ; return BIGGER ; }
+">="		{ return T_BIGGER ; }
 
-"!="		{ printf("NOTEQUAL ") ; return NOTEQUAL ; }
+"!="		{ return T_NOTEQUAL ; }
 
-{Empty}+	{ printf("EMPTY ") ; /* nothing */ }
+{num}		{  return T_NUM ; }
 
-{id}		{ printf("ID ") ; return ID ; }
+{string}	{ return T_STRING ; }
 
-{num}		{ printf("NUM ") ; return NUM ; }
-
-{string}	{ printf("STRING ") ; return STRING ; }
-
-{punct}  	{ printf("PUNCT ") ; return yytext[0] ; }
-
-<<EOF>>		{ printf("EOF ") ; return EOF; }
+{id}		{ return T_ID ; }
 
 . 		{ yyerror("lexical error"); exit(1); }
+
+<<EOF>>		{ printf("\nEOF\n") ; return T_eof;; }
 
 %%

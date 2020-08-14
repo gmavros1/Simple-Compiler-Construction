@@ -1,7 +1,7 @@
-mainclass Example {
+mainclass example {
        public static void main ( )
        {
-         int c;
+         int c ;
          float x, sum, mo;
          c=0;
          x=3.5;
