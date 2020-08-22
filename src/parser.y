@@ -5,20 +5,37 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "parser.h"
 
 int yylex();
 void yyerror (char const *);
 
 %}
 
-%token T_MAINCLASS T_PUBLIC T_STATIC T_VOID T_MAIN T_PRINTLN T_INT T_FLOAT T_FOR T_WHILE T_IF T_EQUAL T_ID T_NUM T_SMALLER T_BIGGER T_NOTEQUAL T_ELSE T_STRING  
+%union {
+	double dval;
+	struct symtab *symp;
+}
 
-%left '(' ')'
+%token T_MAINCLASS T_PUBLIC T_STATIC T_VOID T_MAIN T_PRINTLN T_INT T_FLOAT T_FOR T_WHILE T_IF T_EQUAL 
+%token <symp> T_ID 
+%token <dval> T_NUM 
+%token T_SMALLER T_BIGGER T_NOTEQUAL T_ELSE   
+
+%type <dval> ASSIGN_EXPR
+%type <dval> RVAL
+%type <dval> TERM
+%type <dval> FACTOR
+%type <dval> EXPR
+	
+%right '='
+%left '<' '>'
 %left '+' '-'
 %left '*' '/'
+%left '(' ')'
 %left '{' '}'
 %left ';' ','
-%left '<' '>'
 
 %% 
 		
@@ -50,7 +67,7 @@ TYPE		: T_INT
 		;
 
 ID_LIST 	: T_ID ',' ID_LIST
-		| T_ID
+		| T_ID { $1->value = 0; }
 		;
 
 NULL_STMT	: ';'
@@ -59,7 +76,7 @@ NULL_STMT	: ';'
 ASSIGN_STMT	: ASSIGN_EXPR ';'
 		;
 
-ASSIGN_EXPR	: T_ID '=' EXPR
+ASSIGN_EXPR	: T_ID '=' EXPR	{ $1->value = $3; }
 		;
 
 EXPR		: ASSIGN_EXPR
@@ -93,22 +110,50 @@ BOOL_EXPR	: EXPR C_OP EXPR
 C_OP		: T_EQUAL | '<' | '>' | T_SMALLER | T_BIGGER | T_NOTEQUAL
 		;
 
-RVAL		: RVAL '+' TERM
-		| RVAL '-' TERM
+RVAL		: RVAL '+' TERM	{ $$ = $1 + $3; }
+		| RVAL '-' TERM	{ $$ = $1 - $3; }
 		| TERM
 		;
 
-TERM		: TERM '*' FACTOR
-		| TERM '/' FACTOR
+TERM		: TERM '*' FACTOR { $$ = $1 * $3; }
+		| TERM '/' FACTOR { if ($3 == 0.0)
+					yyerror("divide by zero");
+				    else
+					$$ = $1 / $3;
+				 }
 		| FACTOR
 		;
 
-FACTOR		: '(' EXPR ')'
-		| T_ID
-		| T_NUM
+FACTOR		: '(' EXPR ')' 	{ $$ = $2; }
+		| '-' FACTOR   	{ $$ = -$2; }
+		| T_ID		{ $$ = $1->value; }
+		| T_NUM		{ $$ = $1; }
 		;
 
 %%
+
+struct symtab *symlook(char *s) {
+
+    printf("Putting %s into the symbol table\n", s);
+    //char *p;
+    struct symtab *sp;
+    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+        /* is it already here? */
+        if(sp->name && !strcmp(sp->name, s))
+        {
+            yyerror("already in symbol table\n");
+            exit(1);
+            return sp;
+        }
+        if(!sp->name) { /* is it free */
+            sp->name = strdup(s);
+            return sp;
+        }
+        /* otherwise continue to next */
+    }
+    yyerror("Too many symbols");
+    exit(1); /* cannot continue */
+}
 
 void yyerror (const char * msg)
 {

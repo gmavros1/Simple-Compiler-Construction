@@ -5,6 +5,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
+extern struct symtab *symlook(char *);
 
 int yylex();
 void yyerror(const char *s);
@@ -20,7 +23,6 @@ letter 	[[:alpha:]]
 digit	[[:digit:]]
 id	[A-Za-z][A-Za-z0-9_]*
 num	[0-9]+"."[0-9]+|[0-9]+
-string 	'(digit|letter)*'
 Empty 	[[:space:]]
 punct	[[:punct:]]
 
@@ -62,11 +64,9 @@ punct	[[:punct:]]
 
 "!="		{ return T_NOTEQUAL ; }
 
-{num}		{  return T_NUM ; }
+{num}		{ yylval.dval = atof(yytext); return T_NUM ; }
 
-{string}	{ return T_STRING ; }
-
-{id}		{ return T_ID ; }
+{id}		{ yylval.symp = symlook(yytext); return T_ID ; }
 
 . 		{ yyerror("lexical error"); exit(1); }
 
