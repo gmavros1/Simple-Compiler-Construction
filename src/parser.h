@@ -4,9 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+char ids[25]; // Temp value for ids
+
+/* Element of symbol table */
 struct symtab {
 	char *name;
-	double value;
+	double valueD;
+	int valueI;
+	char *type;
 } symtab[NSYMS];
-
-
+/* 20 Symbols maximum */

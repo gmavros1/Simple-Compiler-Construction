@@ -4,11 +4,14 @@
 
 %{
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <math.h>
 
-extern struct symtab *symlook(char *);
+extern char ids[25];
+void printTable();
 
+int typeBool;
 int yylex();
 void yyerror(const char *s);
 
@@ -44,9 +47,9 @@ punct	[[:punct:]]
 
 "println"	{ return T_PRINTLN ; }
 
-"int"		{ return T_INT ; }
+"int"		{ typeBool = 1; return T_INT ; }
 
-"float"		{ return T_FLOAT ; }
+"float"		{ typeBool = 0; return T_FLOAT ; }
 
 "for"		{ return T_FOR ; }
 
@@ -64,12 +67,15 @@ punct	[[:punct:]]
 
 "!="		{ return T_NOTEQUAL ; }
 
-{num}		{ yylval.dval = atof(yytext); return T_NUM ; }
+{num}		{ if (typeBool) yylval.ival = atoi(yytext); 
+		  else yylval.dval = atof(yytext);  
+		  return T_NUM ; } /* return number in float */
 
-{id}		{ yylval.symp = symlook(yytext); return T_ID ; }
+{id}		{ strcpy(ids, yytext);
+		  return T_ID ; }
 
 . 		{ yyerror("lexical error"); exit(1); }
 
-<<EOF>>		{ printf("\nEOF\n") ; return T_eof;; }
+<<EOF>>		{ printf("\nEOF\n") ; printTable(); return T_eof;; }
 
 %%
