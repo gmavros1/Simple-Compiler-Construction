@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+extern struct symtab *returnStrucktPointer();
 extern char ids[25];
 void printTable();
 
@@ -20,7 +21,7 @@ void yyerror(const char *s);
 %}
 
 
-%option noyywrap 
+%option noyywrap
 
 letter 	[[:alpha:]]
 digit	[[:digit:]]
@@ -33,49 +34,52 @@ punct	[[:punct:]]
 
 {Empty}+	{  /* nothing */ }
 
-{punct}  	{ printf("\n %s \n", yytext) ; return yytext[0] ; }
+{punct}  		{ printf("\n %s \n", yytext) ; return yytext[0] ; }
 
 "mainclass"	{ return  T_MAINCLASS ; }
 
-"public"	{ return T_PUBLIC; }
-	
-"static"	{ return T_STATIC ; }
+"public"		{ return T_PUBLIC; }
 
-"void"		{ return T_VOID ; }
+"static"		{ return T_STATIC ; }
 
-"main"		{ return T_MAIN ; }
+"void"			{ return T_VOID ; }
 
-"println"	{ return T_PRINTLN ; }
+"main"			{ return T_MAIN ; }
 
-"int"		{ typeBool = 1; return T_INT ; }
+"println"		{ return T_PRINTLN ; }
 
-"float"		{ typeBool = 0; return T_FLOAT ; }
+"int"				{ typeBool = 1; return T_INT ; }
 
-"for"		{ return T_FOR ; }
+"float"			{ typeBool = 0; return T_FLOAT ; }
 
-"while"		{ return T_WHILE ; }
+"for"				{ return T_FOR ; }
 
-"if"		{ return T_IF ; }
+"while"			{ return T_WHILE ; }
 
-"else"		{ return T_ELSE ; }
+"if"				{ return T_IF ; }
 
-"=="		{ return T_EQUAL ; }
+"else"			{ return T_ELSE ; }
 
-"<="		{ return T_SMALLER ; }
+"=="				{ return T_EQUAL ; }
 
-">="		{ return T_BIGGER ; }
+"<="				{ return T_SMALLER ; }
 
-"!="		{ return T_NOTEQUAL ; }
+">="				{ return T_BIGGER ; }
 
-{num}		{ if (typeBool) yylval.ival = atoi(yytext); 
-		  else yylval.dval = atof(yytext);  
-		  return T_NUM ; } /* return number in float */
+"!="				{ return T_NOTEQUAL ; }
 
-{id}		{ strcpy(ids, yytext);
-		  return T_ID ; }
+{num}				{  yylval.dval = atof(yytext);
+		  				return T_NUM ; } /* return number in float */
 
-. 		{ yyerror("lexical error"); exit(1); }
+							/* return symbol struct pointer */
+{id}				{ strcpy(ids, yytext);
+							yylval.symp = returnStrucktPointer();
+							/*printTable();*/
+							//yylval.strval = strdup(yytext);
+		  				return T_ID ; }
 
-<<EOF>>		{ printf("\nEOF\n") ; printTable(); return T_eof;; }
+. 					{ yyerror("lexical error"); exit(1); }
+
+<<EOF>>			{ printf("\nEOF\n") ; printTable(); return T_eof;; }
 
 %%

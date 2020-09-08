@@ -495,19 +495,22 @@ char *yytext;
 */
 #line 6 "lexScan.l"
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <math.h>
 
-extern struct symtab *symlook(char *);
+extern struct symtab *returnStrucktPointer();
+extern char ids[25];
+void printTable();
 
-
+int typeBool;
 int yylex();
 void yyerror(const char *s);
 
 #include "y.tab.h"
 #define T_eof	0
-#line 510 "lex.yy.c"
-#line 511 "lex.yy.c"
+#line 513 "lex.yy.c"
+#line 514 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -724,10 +727,10 @@ YY_DECL
 		}
 
 	{
-#line 30 "lexScan.l"
+#line 33 "lexScan.l"
 
 
-#line 731 "lex.yy.c"
+#line 734 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -787,119 +790,125 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 32 "lexScan.l"
+#line 35 "lexScan.l"
 {  /* nothing */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 34 "lexScan.l"
+#line 37 "lexScan.l"
 { printf("\n %s \n", yytext) ; return yytext[0] ; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 36 "lexScan.l"
+#line 39 "lexScan.l"
 { return  T_MAINCLASS ; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 38 "lexScan.l"
+#line 41 "lexScan.l"
 { return T_PUBLIC; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 40 "lexScan.l"
+#line 43 "lexScan.l"
 { return T_STATIC ; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 42 "lexScan.l"
+#line 45 "lexScan.l"
 { return T_VOID ; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 44 "lexScan.l"
+#line 47 "lexScan.l"
 { return T_MAIN ; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 46 "lexScan.l"
+#line 49 "lexScan.l"
 { return T_PRINTLN ; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 48 "lexScan.l"
-{ return T_INT ; }
+#line 51 "lexScan.l"
+{ typeBool = 1; return T_INT ; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 50 "lexScan.l"
-{ return T_FLOAT ; }
+#line 53 "lexScan.l"
+{ typeBool = 0; return T_FLOAT ; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 52 "lexScan.l"
+#line 55 "lexScan.l"
 { return T_FOR ; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 54 "lexScan.l"
+#line 57 "lexScan.l"
 { return T_WHILE ; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 56 "lexScan.l"
+#line 59 "lexScan.l"
 { return T_IF ; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 58 "lexScan.l"
+#line 61 "lexScan.l"
 { return T_ELSE ; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 60 "lexScan.l"
+#line 63 "lexScan.l"
 { return T_EQUAL ; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 62 "lexScan.l"
+#line 65 "lexScan.l"
 { return T_SMALLER ; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 64 "lexScan.l"
+#line 67 "lexScan.l"
 { return T_BIGGER ; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 66 "lexScan.l"
+#line 69 "lexScan.l"
 { return T_NOTEQUAL ; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 68 "lexScan.l"
-{ yylval.dval = atof(yytext); return T_NUM ; } /* return number in float */
+#line 71 "lexScan.l"
+{  yylval.dval = atof(yytext);
+		  				return T_NUM ; } /* return number in float */
 	YY_BREAK
+/* return symbol struct pointer */
 case 20:
 YY_RULE_SETUP
-#line 70 "lexScan.l"
-{ return yytext; return T_ID ; }
+#line 75 "lexScan.l"
+{ strcpy(ids, yytext);
+							yylval.symp = returnStrucktPointer();
+							/*printTable();*/
+							//yylval.strval = strdup(yytext);
+		  				return T_ID ; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 72 "lexScan.l"
+#line 81 "lexScan.l"
 { yyerror("lexical error"); exit(1); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 74 "lexScan.l"
-{ printf("\nEOF\n") ; return T_eof;; }
+#line 83 "lexScan.l"
+{ printf("\nEOF\n") ; printTable(); return T_eof;; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 76 "lexScan.l"
+#line 85 "lexScan.l"
 ECHO;
 	YY_BREAK
-#line 903 "lex.yy.c"
+#line 912 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1902,6 +1911,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 76 "lexScan.l"
+#line 85 "lexScan.l"
 
 
