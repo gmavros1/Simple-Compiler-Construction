@@ -8,9 +8,11 @@
 #include <stdlib.h>
 #include <math.h>
 
-extern struct symtab *returnStrucktPointer();
+
+extern struct symtab *returnStrucktPointer(char *n);
 extern char ids[25];
 void printTable();
+void scopeHandle(char *c);
 
 int typeBool;
 int yylex();
@@ -34,7 +36,9 @@ punct	[[:punct:]]
 
 {Empty}+	{  /* nothing */ }
 
-{punct}  		{ printf("\n %s \n", yytext) ; return yytext[0] ; }
+{punct}  		{ printf("\n %s \n", yytext);
+							scopeHandle(yytext);
+							 return yytext[0] ; }
 
 "mainclass"	{ return  T_MAINCLASS ; }
 
@@ -73,9 +77,7 @@ punct	[[:punct:]]
 
 							/* return symbol struct pointer */
 {id}				{ strcpy(ids, yytext);
-							yylval.symp = returnStrucktPointer();
-							/*printTable();*/
-							//yylval.strval = strdup(yytext);
+							yylval.symp = returnStrucktPointer(yytext);
 		  				return T_ID ; }
 
 . 					{ yyerror("lexical error"); exit(1); }

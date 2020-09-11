@@ -1,4 +1,4 @@
-#define NSYMS 20 /* max nums of symbols */
+#define NSYMS 35 /* max nums of symbols */
 
 #include <stdio.h>
 #include <stdlib.h>

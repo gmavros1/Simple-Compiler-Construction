@@ -14,17 +14,17 @@ void yyerror (char const *);
 void declarationCheck(char *s);
 int returnIndex(char *s);
 extern void symlook(char *);
+void printTable();
 
 %}
 
 /* Type of symbols */
-%union { double dval; /*char *strval;*/ struct symtab *symp; }
+%union { double dval; struct symtab *symp; }
 
 %token T_MAINCLASS T_PUBLIC T_STATIC T_VOID T_MAIN T_PRINTLN T_INT T_FLOAT T_FOR T_WHILE T_IF T_EQUAL
 %token <symp> T_ID
 %token <dval> T_NUM
 %token T_SMALLER T_BIGGER T_NOTEQUAL T_ELSE
-//%token <strval> T_ID
 
 %type <dval> ASSIGN_EXPR
 %type <dval> RVAL
@@ -45,7 +45,7 @@ extern void symlook(char *);
 	PROGRAM 	: T_MAINCLASS T_ID '{' T_PUBLIC T_STATIC T_VOID T_MAIN '(' ')' COMP_STMT '}'
 						;
 
-COMP_STMT 	: '{' STMT_LIST '}'
+COMP_STMT 	: '{' STMT_LIST '}' // scope (like stack)
 						;
 
 STMT_LIST		: /* nothing */
@@ -80,22 +80,24 @@ ASSIGN_STMT	: ASSIGN_EXPR ';'
 						;
 
 ASSIGN_EXPR	: T_ID '=' EXPR	{  //$1->valueD = $3;
-																		declarationCheck(ids);
-																		char *tp = "int";
-																	  if (!strcmp(symtab[returnIndex(ids)].type, tp)){
-																				 //symtab[returnIndex(ids)].valueI = $3 ;
-																				 $1[returnIndex(ids)].valueD = $3 ;
-																				 printf("\n\n\nLOOOOOOOOOOOOOOOOL  %f %s \n\n\n", $3, &ids );
-																		}
-																	  else	{
-																				$1[returnIndex(ids)].valueD = $3 ;
-																		}
+															declarationCheck(ids);
+															char *tp = "int";
+														  if (!strcmp($1->type, tp)){
+																	 $1->valueD = $3 ;
+																	 $1->valueI = (int)($3+0.01);
+																	 printf("\n\nASSIGN_EXPR	\n%f\n%s\n\n", $3, ids );
+																	 /*printf("\n\n\nLOOOOOOOOOOOOOOOOL  %f %s \n\n\n", $3, &ids );*/
+															}
+														  else	{
+																	$1->valueD = $3 ;
+																	printf("\n\nASSIGN_EXPR	\n%f\n%s\n\n", $3, ids );
+															}
 
-																	}
+														}
 						;
 
 EXPR				: ASSIGN_EXPR
-						| RVAL
+						| RVAL { printf("\n\nEXPR\n%f\n\n\n", $1 );}
 						;
 
 FOR_STMT 		: T_FOR '(' OPASSIGN_EXPR ';' OPBOOL_EXPR ';' OPASSIGN_EXPR ')' STMT
@@ -125,9 +127,9 @@ BOOL_EXPR			: EXPR C_OP EXPR
 C_OP					: T_EQUAL | '<' | '>' | T_SMALLER | T_BIGGER | T_NOTEQUAL
 							;
 
-RVAL					: RVAL '+' TERM	{ $$ = $1  + $3; }
+RVAL					: RVAL '+' TERM	{ $$ = $1 + $3; printf("\n\n%f + %f\n\n",$1, $3 ); }
 							| RVAL '-' TERM	{ $$ = $1 - $3; }
-							| TERM
+							| TERM { printf("\n\nRVAL\n%f\n%s\n\n", $1, ids );}
 							;
 
 TERM					: TERM '*' FACTOR { $$ = $1 * $3; }
@@ -136,14 +138,50 @@ TERM					: TERM '*' FACTOR { $$ = $1 * $3; }
 							    								else
 																		$$ = $1 / $3;
 							 									}
-				 			| FACTOR
+				 			| FACTOR { printf("\n\nTERM\n%f\n%s\n\n", $1, ids );}
 				 			;
 
 FACTOR				: '(' EXPR ')' 	{ $$ = $2; }
 							| '-' FACTOR   	{ $$ = -$2; }
-							| T_ID		{ $$ = $1[returnIndex(ids)].valueD; printf("\n\n\nLeeeeeeeeeeeeeeeL %f %s \n\n\n", $1[returnIndex(ids)].valueD, ids); }
-							| T_NUM		{ $$ = $1; }
+							| T_ID		{ $$ = $1->valueD;
+													printf("\n\nFACTOR\n%s\n%f\n\n", $1->name, $1->valueD );
+												}
+							| T_NUM		{ $$ = $1;  printf("\n\n%f\n\n", $1 ); }
 %%
+
+void scopeHandle(char *c){
+	if (!strcmp(c,"}")){
+		struct symtab *st;
+		for (st = &symtab[NSYMS-1]; st > symtab-1; st--) {
+			if (!st->name){
+				continue;
+			}
+			if (strcmp(st->name, "{")){
+				st->name = '\0';
+				st->valueI = 0;
+				st->valueD = 0;
+				st->type = '\0';
+			}
+			else{
+				st->name = '\0';
+				st->valueI = 0;
+				st->valueD = 0;
+				st->type = '\0';
+				break;
+			}
+		}
+	}
+	else if(!strcmp(c,"{")){
+		struct symtab *st;
+		for(st = symtab; st < &symtab[NSYMS]; st++){
+			if(!st->name){
+				st->name = strdup("{" );
+				break;
+			}
+		}
+	}
+	printTable();
+}
 
 void printTable()
 {
@@ -192,7 +230,6 @@ void declarationCheck(char *s){
 
 void symlook(char *s) {
     printf("Putting %s into the symbol table\n", s);
-    //char *p;
     struct symtab *sp;
     for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
         /* is it already here? */
@@ -210,8 +247,7 @@ void symlook(char *s) {
         }
         /* otherwise continue to next */
     }
-    //yyerror("Too many symbols");
-    //exit(1); /* cannot continue */
+		printTable();
 }
 
 
@@ -221,16 +257,24 @@ void yyerror (const char * msg)
   	exit(1);
 }
 
-struct symtab *returnStrucktPointer(){
+struct symtab *returnStrucktPointer(char *n){
 		struct symtab *sp;
-		sp = symtab;
-		return sp;
+		//sp = symtab;
+		for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+        if(sp->name && !strcmp(sp->name, n))
+        {
+            return sp;
+        }
+				if(!sp->name) {
+      			break;
+        }
+    }
 }
 
 
 int main ()
 {
-	#if YYDEBUG ==1
+	#if YYDEBUG ==0
 	extern int yydebug;
 	yydebug=1;
 	#endif

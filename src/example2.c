@@ -10,7 +10,7 @@ mainclass example {
          {
                   sum=sum+x;
                   c=c+1;
-                 x=x+1.5;
+                  x=x+1.5;
         }
        mo=sum/5;
        println (mo);
