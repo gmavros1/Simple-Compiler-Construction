@@ -6,8 +6,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "parser.h"
+#include "asCodeGen.h"
 
+FILE *targetOut;
+int varsCount = 0;
 int yylex();
 char *type;
 void yyerror (char const *);
@@ -69,8 +73,8 @@ TYPE				: T_INT {char *s="int" ; type =  strdup(s);}
 						| T_FLOAT {char *s="flt" ; type =  strdup(s);}
 						;
 
-ID_LIST 		: T_ID { printf("\n\n******%s******\n\n", ids) ; symlook(ids); } ',' ID_LIST
-						| T_ID { printf("\n\n******%s******\n\n", ids) ; symlook(ids); }
+ID_LIST 		: T_ID { printf("\n\n******%s******\n\n", ids) ; symlook(ids); varsCount++; } ',' ID_LIST
+						| T_ID { printf("\n\n******%s******\n\n", ids) ; symlook(ids); varsCount++; }
 						;
 
 NULL_STMT		: ';'
@@ -148,6 +152,8 @@ FACTOR				: '(' EXPR ')' 	{ $$ = $2; }
 												}
 							| T_NUM		{ $$ = $1;  printf("\n\n%f\n\n", $1 ); }
 %%
+
+#include "asCodeGen.c"
 
 void scopeHandle(char *c){
 	if (!strcmp(c,"}")){
@@ -274,12 +280,20 @@ struct symtab *returnStrucktPointer(char *n){
 
 int main ()
 {
+	/*DEBUG TOOL*/
 	#if YYDEBUG ==0
 	extern int yydebug;
 	yydebug=1;
 	#endif
 
-  if(!yyparse()){
-	printf("Compiled !!!\n");
-   }
+
+	/*TARGET CODE GENERATION*/
+	targetOut = fopen("target.asm", "w");
+
+  if(!yyparse())
+		printf("Parsed Successfully !!!\n");
+
+	instructionsOut("li	$v0 10\t# Code for syscall: exit\n\tsyscall\n");
+
+	fclose(targetOut);
 }

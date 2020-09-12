@@ -72,8 +72,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "parser.h"
+#include "asCodeGen.h"
 
+FILE *targetOut;
+int varsCount = 0;
 int yylex();
 char *type;
 void yyerror (char const *);
@@ -83,7 +87,7 @@ extern void symlook(char *);
 void printTable();
 
 
-#line 87 "y.tab.c"
+#line 91 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -175,10 +179,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "parser.y"
+#line 26 "parser.y"
  double dval; struct symtab *symp; 
 
-#line 182 "y.tab.c"
+#line 186 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -623,12 +627,12 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    45,    45,    48,    51,    52,    55,    56,    57,    58,
-      59,    60,    61,    62,    65,    68,    69,    72,    72,    73,
-      76,    79,    82,    99,   100,   103,   106,   107,   110,   111,
-     114,   117,   120,   121,   124,   127,   127,   127,   127,   127,
-     127,   130,   131,   132,   135,   136,   141,   144,   145,   146,
-     149
+       0,    49,    49,    52,    55,    56,    59,    60,    61,    62,
+      63,    64,    65,    66,    69,    72,    73,    76,    76,    77,
+      80,    83,    86,   103,   104,   107,   110,   111,   114,   115,
+     118,   121,   124,   125,   128,   131,   131,   131,   131,   131,
+     131,   134,   135,   136,   139,   140,   145,   148,   149,   150,
+     153
 };
 #endif
 
@@ -1267,31 +1271,31 @@ yyreduce:
   switch (yyn)
     {
   case 15: /* TYPE: T_INT  */
-#line 68 "parser.y"
+#line 72 "parser.y"
                                         {char *s="int" ; type =  strdup(s);}
-#line 1273 "y.tab.c"
+#line 1277 "y.tab.c"
     break;
 
   case 16: /* TYPE: T_FLOAT  */
-#line 69 "parser.y"
+#line 73 "parser.y"
                                                           {char *s="flt" ; type =  strdup(s);}
-#line 1279 "y.tab.c"
+#line 1283 "y.tab.c"
     break;
 
   case 17: /* $@1: %empty  */
-#line 72 "parser.y"
-                               { printf("\n\n******%s******\n\n", ids) ; symlook(ids); }
-#line 1285 "y.tab.c"
+#line 76 "parser.y"
+                               { printf("\n\n******%s******\n\n", ids) ; symlook(ids); varsCount++; }
+#line 1289 "y.tab.c"
     break;
 
   case 19: /* ID_LIST: T_ID  */
-#line 73 "parser.y"
-                                                       { printf("\n\n******%s******\n\n", ids) ; symlook(ids); }
-#line 1291 "y.tab.c"
+#line 77 "parser.y"
+                                                       { printf("\n\n******%s******\n\n", ids) ; symlook(ids); varsCount++; }
+#line 1295 "y.tab.c"
     break;
 
   case 22: /* ASSIGN_EXPR: T_ID '=' EXPR  */
-#line 82 "parser.y"
+#line 86 "parser.y"
                                 {  //$1->valueD = $3;
 															declarationCheck(ids);
 															char *tp = "int";
@@ -1307,83 +1311,83 @@ yyreduce:
 															}
 
 														}
-#line 1311 "y.tab.c"
+#line 1315 "y.tab.c"
     break;
 
   case 24: /* EXPR: RVAL  */
-#line 100 "parser.y"
+#line 104 "parser.y"
                                                        { printf("\n\nEXPR\n%f\n\n\n", (yyvsp[0].dval) );}
-#line 1317 "y.tab.c"
+#line 1321 "y.tab.c"
     break;
 
   case 41: /* RVAL: RVAL '+' TERM  */
-#line 130 "parser.y"
+#line 134 "parser.y"
                                                         { (yyval.dval) = (yyvsp[-2].dval) + (yyvsp[0].dval); printf("\n\n%f + %f\n\n",(yyvsp[-2].dval), (yyvsp[0].dval) ); }
-#line 1323 "y.tab.c"
+#line 1327 "y.tab.c"
     break;
 
   case 42: /* RVAL: RVAL '-' TERM  */
-#line 131 "parser.y"
+#line 135 "parser.y"
                                                                         { (yyval.dval) = (yyvsp[-2].dval) - (yyvsp[0].dval); }
-#line 1329 "y.tab.c"
+#line 1333 "y.tab.c"
     break;
 
   case 43: /* RVAL: TERM  */
-#line 132 "parser.y"
+#line 136 "parser.y"
                                                                { printf("\n\nRVAL\n%f\n%s\n\n", (yyvsp[0].dval), ids );}
-#line 1335 "y.tab.c"
+#line 1339 "y.tab.c"
     break;
 
   case 44: /* TERM: TERM '*' FACTOR  */
-#line 135 "parser.y"
+#line 139 "parser.y"
                                                           { (yyval.dval) = (yyvsp[-2].dval) * (yyvsp[0].dval); }
-#line 1341 "y.tab.c"
+#line 1345 "y.tab.c"
     break;
 
   case 45: /* TERM: TERM '/' FACTOR  */
-#line 136 "parser.y"
+#line 140 "parser.y"
                                                                           { if ((yyvsp[0].dval) == 0)
 																		yyerror("divide by zero");
 							    								else
 																		(yyval.dval) = (yyvsp[-2].dval) / (yyvsp[0].dval);
 							 									}
-#line 1351 "y.tab.c"
+#line 1355 "y.tab.c"
     break;
 
   case 46: /* TERM: FACTOR  */
-#line 141 "parser.y"
+#line 145 "parser.y"
                                                                  { printf("\n\nTERM\n%f\n%s\n\n", (yyvsp[0].dval), ids );}
-#line 1357 "y.tab.c"
+#line 1361 "y.tab.c"
     break;
 
   case 47: /* FACTOR: '(' EXPR ')'  */
-#line 144 "parser.y"
+#line 148 "parser.y"
                                                 { (yyval.dval) = (yyvsp[-1].dval); }
-#line 1363 "y.tab.c"
+#line 1367 "y.tab.c"
     break;
 
   case 48: /* FACTOR: '-' FACTOR  */
-#line 145 "parser.y"
+#line 149 "parser.y"
                                                                         { (yyval.dval) = -(yyvsp[0].dval); }
-#line 1369 "y.tab.c"
+#line 1373 "y.tab.c"
     break;
 
   case 49: /* FACTOR: T_ID  */
-#line 146 "parser.y"
+#line 150 "parser.y"
                                                                         { (yyval.dval) = (yyvsp[0].symp)->valueD;
 													printf("\n\nFACTOR\n%s\n%f\n\n", (yyvsp[0].symp)->name, (yyvsp[0].symp)->valueD );
 												}
-#line 1377 "y.tab.c"
+#line 1381 "y.tab.c"
     break;
 
   case 50: /* FACTOR: T_NUM  */
-#line 149 "parser.y"
+#line 153 "parser.y"
                                                                         { (yyval.dval) = (yyvsp[0].dval);  printf("\n\n%f\n\n", (yyvsp[0].dval) ); }
-#line 1383 "y.tab.c"
+#line 1387 "y.tab.c"
     break;
 
 
-#line 1387 "y.tab.c"
+#line 1391 "y.tab.c"
 
       default: break;
     }
@@ -1577,8 +1581,10 @@ yyreturn:
   return yyresult;
 }
 
-#line 150 "parser.y"
+#line 154 "parser.y"
 
+
+#include "asCodeGen.c"
 
 void scopeHandle(char *c){
 	if (!strcmp(c,"}")){
@@ -1705,12 +1711,20 @@ struct symtab *returnStrucktPointer(char *n){
 
 int main ()
 {
+	/*DEBUG TOOL*/
 	#if YYDEBUG ==0
 	extern int yydebug;
 	yydebug=1;
 	#endif
 
-  if(!yyparse()){
-	printf("Compiled !!!\n");
-   }
+
+	/*TARGET CODE GENERATION*/
+	targetOut = fopen("target.asm", "w");
+
+  if(!yyparse())
+		printf("Parsed Successfully !!!\n");
+
+	instructionsOut("li	$v0 10\t# Code for syscall: exit\n\tsyscall\n");
+
+	fclose(targetOut);
 }

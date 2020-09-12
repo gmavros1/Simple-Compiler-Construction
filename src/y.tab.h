@@ -102,7 +102,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "parser.y"
+#line 26 "parser.y"
  double dval; struct symtab *symp; 
 
 #line 109 "y.tab.h"
