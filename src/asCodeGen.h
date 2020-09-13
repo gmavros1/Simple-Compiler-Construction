@@ -1,10 +1,12 @@
 void dataOut();
 void instructionsOut(char *s);
 void declarationOut(char *s);
-void assignOut();
-void printOut(float f);
+void assignOut(char *s, int v);
+void printOut(char *s);
 void ifOut();
-void ifElseOut();
+void ifOut(int a, int b);
+void elseOut();
+void endif();
 void whileOut();
 void forOut();
 void substractOut(float a, float b);

@@ -12,6 +12,8 @@
 
 FILE *targetOut;
 int varsCount = 0;
+int ifCount = 0;
+char *logicOp;
 int yylex();
 char *type;
 void yyerror (char const *);
@@ -83,10 +85,8 @@ NULL_STMT		: ';'
 ASSIGN_STMT	: ASSIGN_EXPR ';'
 						;
 
-ASSIGN_EXPR	: T_ID '=' EXPR	{  //$1->valueD = $3;
-															declarationCheck(ids);
+ASSIGN_EXPR	: T_ID '=' EXPR	{	declarationCheck(ids);
 															char *tp = "int";
-															//printf("\n\n\n\n%d\n\n\n\n\n", stackIndex($1->name));
 														  if (!strcmp($1->type, tp)){
 																	 $1->valueD = $3 ;
 																	 $1->valueI = (int)($3+0.01);
@@ -94,6 +94,7 @@ ASSIGN_EXPR	: T_ID '=' EXPR	{  //$1->valueD = $3;
 														  else	{
 																	$1->valueD = $3 ;
 															}
+															assignOut($1->name, (int)($3+0.01));
 
 														}
 						;
@@ -116,17 +117,22 @@ OPBOOL_EXPR		: /* nothing */
 WHILE_STMT		: T_WHILE '(' BOOL_EXPR ')' STMT
 							;
 
-IF_STMT				: T_IF '(' BOOL_EXPR ')' STMT ELSE_PART
+IF_STMT				: T_IF '(' BOOL_EXPR ')' STMT {fprintf(targetOut, "\n\tj EndIf%d\n", ifCount); elseOut();} ELSE_PART { endif(); ifCount++;}
 							;
 
 ELSE_PART			: /* nothing */
-							| T_ELSE STMT
+							| T_ELSE  STMT
 							;
 
-BOOL_EXPR			: EXPR C_OP EXPR
+BOOL_EXPR			: EXPR C_OP EXPR { ifOut((int)($1), (int)($3)); }
 							;
 
-C_OP					: T_EQUAL | '<' | '>' | T_SMALLER | T_BIGGER | T_NOTEQUAL
+C_OP					: T_EQUAL { logicOp = strdup("bne"); }
+							| '<' { logicOp = strdup("bgt");}
+							| '>' { logicOp = strdup("blt");}
+							| T_SMALLER { logicOp = strdup("bge");}
+							| T_BIGGER { logicOp = strdup("ble");}
+							| T_NOTEQUAL { logicOp = strdup("beq");}
 							;
 
 RVAL					: RVAL '+' TERM	{ $$ = $1 + $3; }

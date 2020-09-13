@@ -4,7 +4,13 @@ mainclass Fibonacci {
          int first, second, third;
          first = 1;
          second = 2;
-         println(second);
+         third = first + second;
+         if(third == 2){
+            println(third);
+         }
+         else{
+           println(first);
+         }
 
        }
 }
