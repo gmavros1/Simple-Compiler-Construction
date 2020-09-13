@@ -629,10 +629,10 @@ static const yytype_uint8 yyrline[] =
 {
        0,    49,    49,    52,    55,    56,    59,    60,    61,    62,
       63,    64,    65,    66,    69,    72,    73,    76,    76,    77,
-      80,    83,    86,   103,   104,   107,   110,   111,   114,   115,
-     118,   121,   124,   125,   128,   131,   131,   131,   131,   131,
-     131,   134,   135,   136,   139,   140,   145,   148,   149,   150,
-     153
+      80,    83,    86,   101,   102,   105,   108,   109,   112,   113,
+     116,   119,   122,   123,   126,   129,   129,   129,   129,   129,
+     129,   132,   133,   134,   137,   138,   143,   146,   147,   148,
+     149
 };
 #endif
 
@@ -1270,28 +1270,34 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 13: /* STMT: T_PRINTLN '(' EXPR ')' ';'  */
+#line 66 "parser.y"
+                                                                             {printOut(ids);}
+#line 1277 "y.tab.c"
+    break;
+
   case 15: /* TYPE: T_INT  */
 #line 72 "parser.y"
                                         {char *s="int" ; type =  strdup(s);}
-#line 1277 "y.tab.c"
+#line 1283 "y.tab.c"
     break;
 
   case 16: /* TYPE: T_FLOAT  */
 #line 73 "parser.y"
                                                           {char *s="flt" ; type =  strdup(s);}
-#line 1283 "y.tab.c"
+#line 1289 "y.tab.c"
     break;
 
   case 17: /* $@1: %empty  */
 #line 76 "parser.y"
-                               { printf("\n\n******%s******\n\n", ids) ; symlook(ids); varsCount++; }
-#line 1289 "y.tab.c"
+                               { symlook(ids); varsCount++; declarationOut(ids); }
+#line 1295 "y.tab.c"
     break;
 
   case 19: /* ID_LIST: T_ID  */
 #line 77 "parser.y"
-                                                       { printf("\n\n******%s******\n\n", ids) ; symlook(ids); varsCount++; }
-#line 1295 "y.tab.c"
+                                                       { symlook(ids); varsCount++; declarationOut(ids); }
+#line 1301 "y.tab.c"
     break;
 
   case 22: /* ASSIGN_EXPR: T_ID '=' EXPR  */
@@ -1299,95 +1305,73 @@ yyreduce:
                                 {  //$1->valueD = $3;
 															declarationCheck(ids);
 															char *tp = "int";
+															//printf("\n\n\n\n%d\n\n\n\n\n", stackIndex($1->name));
 														  if (!strcmp((yyvsp[-2].symp)->type, tp)){
 																	 (yyvsp[-2].symp)->valueD = (yyvsp[0].dval) ;
 																	 (yyvsp[-2].symp)->valueI = (int)((yyvsp[0].dval)+0.01);
-																	 printf("\n\nASSIGN_EXPR	\n%f\n%s\n\n", (yyvsp[0].dval), ids );
-																	 /*printf("\n\n\nLOOOOOOOOOOOOOOOOL  %f %s \n\n\n", $3, &ids );*/
 															}
 														  else	{
 																	(yyvsp[-2].symp)->valueD = (yyvsp[0].dval) ;
-																	printf("\n\nASSIGN_EXPR	\n%f\n%s\n\n", (yyvsp[0].dval), ids );
 															}
 
 														}
-#line 1315 "y.tab.c"
-    break;
-
-  case 24: /* EXPR: RVAL  */
-#line 104 "parser.y"
-                                                       { printf("\n\nEXPR\n%f\n\n\n", (yyvsp[0].dval) );}
-#line 1321 "y.tab.c"
+#line 1319 "y.tab.c"
     break;
 
   case 41: /* RVAL: RVAL '+' TERM  */
-#line 134 "parser.y"
-                                                        { (yyval.dval) = (yyvsp[-2].dval) + (yyvsp[0].dval); printf("\n\n%f + %f\n\n",(yyvsp[-2].dval), (yyvsp[0].dval) ); }
-#line 1327 "y.tab.c"
+#line 132 "parser.y"
+                                                        { (yyval.dval) = (yyvsp[-2].dval) + (yyvsp[0].dval); }
+#line 1325 "y.tab.c"
     break;
 
   case 42: /* RVAL: RVAL '-' TERM  */
-#line 135 "parser.y"
+#line 133 "parser.y"
                                                                         { (yyval.dval) = (yyvsp[-2].dval) - (yyvsp[0].dval); }
-#line 1333 "y.tab.c"
-    break;
-
-  case 43: /* RVAL: TERM  */
-#line 136 "parser.y"
-                                                               { printf("\n\nRVAL\n%f\n%s\n\n", (yyvsp[0].dval), ids );}
-#line 1339 "y.tab.c"
+#line 1331 "y.tab.c"
     break;
 
   case 44: /* TERM: TERM '*' FACTOR  */
-#line 139 "parser.y"
+#line 137 "parser.y"
                                                           { (yyval.dval) = (yyvsp[-2].dval) * (yyvsp[0].dval); }
-#line 1345 "y.tab.c"
+#line 1337 "y.tab.c"
     break;
 
   case 45: /* TERM: TERM '/' FACTOR  */
-#line 140 "parser.y"
+#line 138 "parser.y"
                                                                           { if ((yyvsp[0].dval) == 0)
 																		yyerror("divide by zero");
 							    								else
 																		(yyval.dval) = (yyvsp[-2].dval) / (yyvsp[0].dval);
 							 									}
-#line 1355 "y.tab.c"
-    break;
-
-  case 46: /* TERM: FACTOR  */
-#line 145 "parser.y"
-                                                                 { printf("\n\nTERM\n%f\n%s\n\n", (yyvsp[0].dval), ids );}
-#line 1361 "y.tab.c"
+#line 1347 "y.tab.c"
     break;
 
   case 47: /* FACTOR: '(' EXPR ')'  */
-#line 148 "parser.y"
+#line 146 "parser.y"
                                                 { (yyval.dval) = (yyvsp[-1].dval); }
-#line 1367 "y.tab.c"
+#line 1353 "y.tab.c"
     break;
 
   case 48: /* FACTOR: '-' FACTOR  */
-#line 149 "parser.y"
+#line 147 "parser.y"
                                                                         { (yyval.dval) = -(yyvsp[0].dval); }
-#line 1373 "y.tab.c"
+#line 1359 "y.tab.c"
     break;
 
   case 49: /* FACTOR: T_ID  */
-#line 150 "parser.y"
-                                                                        { (yyval.dval) = (yyvsp[0].symp)->valueD;
-													printf("\n\nFACTOR\n%s\n%f\n\n", (yyvsp[0].symp)->name, (yyvsp[0].symp)->valueD );
-												}
-#line 1381 "y.tab.c"
+#line 148 "parser.y"
+                                                                        { (yyval.dval) = (yyvsp[0].symp)->valueD; }
+#line 1365 "y.tab.c"
     break;
 
   case 50: /* FACTOR: T_NUM  */
-#line 153 "parser.y"
-                                                                        { (yyval.dval) = (yyvsp[0].dval);  printf("\n\n%f\n\n", (yyvsp[0].dval) ); }
-#line 1387 "y.tab.c"
+#line 149 "parser.y"
+                                                                        { (yyval.dval) = (yyvsp[0].dval); }
+#line 1371 "y.tab.c"
     break;
 
 
-#line 1391 "y.tab.c"
+#line 1375 "y.tab.c"
 
       default: break;
     }
@@ -1581,7 +1565,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 154 "parser.y"
+#line 150 "parser.y"
 
 
 #include "asCodeGen.c"
@@ -1617,7 +1601,7 @@ void scopeHandle(char *c){
 			}
 		}
 	}
-	printTable();
+	//printTable();
 }
 
 void printTable()
@@ -1640,13 +1624,17 @@ void printTable()
 
 int returnIndex(char *s){
     int counter = 0;
+		int abstrctForSymbol=0;
+		char *st = "{";
     struct symtab *sp;
     for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
         /* is it already here? */
         if(sp->name && !strcmp(sp->name, s))
         {
-            return counter;
+            return counter-abstrctForSymbol;
         }
+				if(sp->name && !strcmp(sp->name, st))
+					abstrctForSymbol++;
 				counter ++;
     }
 }
@@ -1721,10 +1709,14 @@ int main ()
 	/*TARGET CODE GENERATION*/
 	targetOut = fopen("target.asm", "w");
 
+	dataOut();
+
   if(!yyparse())
 		printf("Parsed Successfully !!!\n");
 
-	instructionsOut("li	$v0 10\t# Code for syscall: exit\n\tsyscall\n");
+	instructionsOut("\n\nli	$v0 10\n\tsyscall\n");
+	instructionsOut("\nprintl:\n");
+  instructionsOut("li $v0, 1\n \tmove $a0, $s0\n \tsyscall\n\n \tli $v0, 4\n \tla $a0, newLine\n \tsyscall\n\n \tjr $ra\n");
 
 	fclose(targetOut);
 }

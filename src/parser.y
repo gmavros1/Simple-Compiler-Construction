@@ -63,7 +63,7 @@ STMT 				: ASSIGN_STMT
 						| COMP_STMT
 						| DECLARATION
 						| NULL_STMT
-						| T_PRINTLN '(' EXPR ')' ';'
+						| T_PRINTLN '(' EXPR ')' ';' {printOut(ids);}
 						;
 
 DECLARATION	: TYPE ID_LIST ';'
@@ -73,8 +73,8 @@ TYPE				: T_INT {char *s="int" ; type =  strdup(s);}
 						| T_FLOAT {char *s="flt" ; type =  strdup(s);}
 						;
 
-ID_LIST 		: T_ID { printf("\n\n******%s******\n\n", ids) ; symlook(ids); varsCount++; } ',' ID_LIST
-						| T_ID { printf("\n\n******%s******\n\n", ids) ; symlook(ids); varsCount++; }
+ID_LIST 		: T_ID { symlook(ids); varsCount++; declarationOut(ids); } ',' ID_LIST
+						| T_ID { symlook(ids); varsCount++; declarationOut(ids); }
 						;
 
 NULL_STMT		: ';'
@@ -86,22 +86,20 @@ ASSIGN_STMT	: ASSIGN_EXPR ';'
 ASSIGN_EXPR	: T_ID '=' EXPR	{  //$1->valueD = $3;
 															declarationCheck(ids);
 															char *tp = "int";
+															//printf("\n\n\n\n%d\n\n\n\n\n", stackIndex($1->name));
 														  if (!strcmp($1->type, tp)){
 																	 $1->valueD = $3 ;
 																	 $1->valueI = (int)($3+0.01);
-																	 printf("\n\nASSIGN_EXPR	\n%f\n%s\n\n", $3, ids );
-																	 /*printf("\n\n\nLOOOOOOOOOOOOOOOOL  %f %s \n\n\n", $3, &ids );*/
 															}
 														  else	{
 																	$1->valueD = $3 ;
-																	printf("\n\nASSIGN_EXPR	\n%f\n%s\n\n", $3, ids );
 															}
 
 														}
 						;
 
 EXPR				: ASSIGN_EXPR
-						| RVAL { printf("\n\nEXPR\n%f\n\n\n", $1 );}
+						| RVAL
 						;
 
 FOR_STMT 		: T_FOR '(' OPASSIGN_EXPR ';' OPBOOL_EXPR ';' OPASSIGN_EXPR ')' STMT
@@ -131,9 +129,9 @@ BOOL_EXPR			: EXPR C_OP EXPR
 C_OP					: T_EQUAL | '<' | '>' | T_SMALLER | T_BIGGER | T_NOTEQUAL
 							;
 
-RVAL					: RVAL '+' TERM	{ $$ = $1 + $3; printf("\n\n%f + %f\n\n",$1, $3 ); }
+RVAL					: RVAL '+' TERM	{ $$ = $1 + $3; }
 							| RVAL '-' TERM	{ $$ = $1 - $3; }
-							| TERM { printf("\n\nRVAL\n%f\n%s\n\n", $1, ids );}
+							| TERM
 							;
 
 TERM					: TERM '*' FACTOR { $$ = $1 * $3; }
@@ -142,15 +140,13 @@ TERM					: TERM '*' FACTOR { $$ = $1 * $3; }
 							    								else
 																		$$ = $1 / $3;
 							 									}
-				 			| FACTOR { printf("\n\nTERM\n%f\n%s\n\n", $1, ids );}
+				 			| FACTOR
 				 			;
 
 FACTOR				: '(' EXPR ')' 	{ $$ = $2; }
 							| '-' FACTOR   	{ $$ = -$2; }
-							| T_ID		{ $$ = $1->valueD;
-													printf("\n\nFACTOR\n%s\n%f\n\n", $1->name, $1->valueD );
-												}
-							| T_NUM		{ $$ = $1;  printf("\n\n%f\n\n", $1 ); }
+							| T_ID		{ $$ = $1->valueD; }
+							| T_NUM		{ $$ = $1; }
 %%
 
 #include "asCodeGen.c"
@@ -186,7 +182,7 @@ void scopeHandle(char *c){
 			}
 		}
 	}
-	printTable();
+	//printTable();
 }
 
 void printTable()
@@ -209,13 +205,17 @@ void printTable()
 
 int returnIndex(char *s){
     int counter = 0;
+		int abstrctForSymbol=0;
+		char *st = "{";
     struct symtab *sp;
     for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
         /* is it already here? */
         if(sp->name && !strcmp(sp->name, s))
         {
-            return counter;
+            return counter-abstrctForSymbol;
         }
+				if(sp->name && !strcmp(sp->name, st))
+					abstrctForSymbol++;
 				counter ++;
     }
 }
@@ -290,10 +290,14 @@ int main ()
 	/*TARGET CODE GENERATION*/
 	targetOut = fopen("target.asm", "w");
 
+	dataOut();
+
   if(!yyparse())
 		printf("Parsed Successfully !!!\n");
 
-	instructionsOut("li	$v0 10\t# Code for syscall: exit\n\tsyscall\n");
+	instructionsOut("\n\nli	$v0 10\n\tsyscall\n");
+	instructionsOut("\nprintl:\n");
+  instructionsOut("li $v0, 1\n \tmove $a0, $s0\n \tsyscall\n\n \tli $v0, 4\n \tla $a0, newLine\n \tsyscall\n\n \tjr $ra\n");
 
 	fclose(targetOut);
 }

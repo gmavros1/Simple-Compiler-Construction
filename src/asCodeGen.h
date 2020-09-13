@@ -1,9 +1,14 @@
 void dataOut();
 void instructionsOut(char *s);
-void declarationOut();
+void declarationOut(char *s);
 void assignOut();
-void printOut();
+void printOut(float f);
 void ifOut();
 void ifElseOut();
 void whileOut();
 void forOut();
+void substractOut(float a, float b);
+void addOut(float a, float b);
+void multOut(float a, float b);
+void divOut(float a, float b);
+int stackIndex(char *s);

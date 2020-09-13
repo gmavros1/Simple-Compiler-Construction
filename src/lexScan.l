@@ -36,9 +36,8 @@ punct	[[:punct:]]
 
 {Empty}+	{  /* nothing */ }
 
-{punct}  		{ printf("\n %s \n", yytext);
-							scopeHandle(yytext);
-							 return yytext[0] ; }
+{punct}  		{	scopeHandle(yytext);
+							return yytext[0] ; }
 
 "mainclass"	{ return  T_MAINCLASS ; }
 
