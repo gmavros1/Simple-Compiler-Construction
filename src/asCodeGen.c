@@ -51,3 +51,9 @@ void ifOut(int a, int b){
 	instructionsOut(string);
 
 }
+
+void whileOut(){
+	char string[100];
+	sprintf(string, "\n\t%s $t0, $t1, Exit%d", logicOp, loopCount);
+	instructionsOut(string);
+}

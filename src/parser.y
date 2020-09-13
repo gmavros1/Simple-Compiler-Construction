@@ -13,6 +13,9 @@
 FILE *targetOut;
 int varsCount = 0;
 int ifCount = 0;
+int loopCount = 0;
+float expr1;
+float expr2;
 char *logicOp;
 int yylex();
 char *type;
@@ -114,17 +117,17 @@ OPBOOL_EXPR		: /* nothing */
 							| BOOL_EXPR
 							;
 
-WHILE_STMT		: T_WHILE '(' BOOL_EXPR ')' STMT
+WHILE_STMT		: T_WHILE '(' BOOL_EXPR ')' {fprintf(targetOut, "\n\taddi $t0, $zero, %d\n\taddi $t1, $zero, %d",(int)(expr1), (int)(expr2)); fprintf(targetOut,"\n\tWhile%d:", loopCount); whileOut(); }  STMT {fprintf(targetOut, "\n\n\tj While%d\n", loopCount); fprintf(targetOut, "\n\nExit%d:\n", loopCount);  loopCount++;}
 							;
 
-IF_STMT				: T_IF '(' BOOL_EXPR ')' STMT {fprintf(targetOut, "\n\tj EndIf%d\n", ifCount); elseOut();} ELSE_PART { endif(); ifCount++;}
+IF_STMT				: T_IF '(' BOOL_EXPR ')' { ifOut((int)(expr1), (int)(expr2)); } STMT {fprintf(targetOut, "\n\tj EndIf%d\n", ifCount); elseOut();} ELSE_PART { endif(); ifCount++;}
 							;
 
 ELSE_PART			: /* nothing */
 							| T_ELSE  STMT
 							;
 
-BOOL_EXPR			: EXPR C_OP EXPR { ifOut((int)($1), (int)($3)); }
+BOOL_EXPR			: EXPR C_OP EXPR {expr1 = $1; expr2 = $3;}
 							;
 
 C_OP					: T_EQUAL { logicOp = strdup("bne"); }
