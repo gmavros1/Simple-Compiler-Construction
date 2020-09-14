@@ -6,6 +6,7 @@ void dataOut(){
 	fprintf(targetOut, ".data\n\tnewLine: .asciiz \"\\n\" \n\tzero:	.float 0.0 \n.text\n\nmain:\n\n\taddi $sp $sp -40\n\n");
 }
 
+//DECALRE
 void declarationOut(char *id){
 	instructionsOut("\n\t#declare variable");
 	char string[100];
@@ -13,11 +14,13 @@ void declarationOut(char *id){
 	instructionsOut(string);
 }
 
+//FIND VARIABLE TO STACK
 int stackIndex(char *s){
 	int indx = returnIndex(s);
 	return 4*indx;
 }
 
+//PRINT
 void printOut(char *id){
 	instructionsOut("\n\t#print");
 	char string[100];
@@ -25,12 +28,26 @@ void printOut(char *id){
 	instructionsOut(string);
 }
 
-/*void assignOut(char *id, int v){
-	instructionsOut("\n\t#assign value");
+//ASSIGN
+int indxVars(int v){
+	if (v == -1)
+		return 7;
+	else if(v == -2)
+		return 6;
+	else
+		return v;
+}
+
+void factorOutNum(int v){
 	char string[100];
-	sprintf(string, "\n\taddi $s0, $zero, %d\n\tsw $s0 %d($sp)", v, stackIndex(id));
+	sprintf(string, "\n\taddi $t%d, $zero, %d", varsCount%8, v);
 	instructionsOut(string);
-}*/
+}
+void factorOutId(char *id, int v){
+	char string[100];
+	sprintf(string, "\n\tlw $t%d, %d($sp)", varsCount%8, stackIndex(id));
+	instructionsOut(string);
+}
 
 void assignOut(char *id){
 	instructionsOut("\n\t#assign value");
@@ -39,6 +56,7 @@ void assignOut(char *id){
 	instructionsOut(string);
 }
 
+//IFS
 void elseOut(){
 	char string[100];
 	sprintf(string, "\n\tElse%d:", ifCount);
@@ -53,15 +71,14 @@ void endif(){
 
 void 	ifBoolOut(int a, int b){
 	char string[100];
-	//sprintf(string, "\n\taddi $t0, $zero, %d\n\taddi $t1, $zero, %d\n\n\t%s $t0, $t1, Else%d",a,b, logicOp, ifCount);
 	sprintf(string, "\n\n\t%s $t%d, $t%d, Else%d", logicOp, indxVars((varsCount%8)-1), indxVars((varsCount%8)-2) ,ifCount);
 	instructionsOut(string);
 
 }
 
+//LOOPS
 void 	whileBoolOut(int a, int b){
 	char string[100];
-	//sprintf(string, "\n\taddi $t0, $zero, %d\n\taddi $t1, $zero, %d\n\n\t%s $t0, $t1, Else%d",a,b, logicOp, ifCount);
 	sprintf(string, "\n\n\t%s $t%d, $t%d, Exit%d", logicOp, indxVars((varsCount%8)-2), indxVars((varsCount%8)-1) ,loopCount);
 	instructionsOut(string);
 
@@ -69,37 +86,12 @@ void 	whileBoolOut(int a, int b){
 
 void 	forBoolOut(int a, int b){
 	char string[100];
-	//sprintf(string, "\n\taddi $t0, $zero, %d\n\taddi $t1, $zero, %d\n\n\t%s $t0, $t1, Else%d",a,b, logicOp, ifCount);
 	sprintf(string, "\n\n\t%s $t%d, $t%d, Exit%d", logicOp, indxVars((varsCount%8)-2), indxVars((varsCount%8)-1) ,loopCount);
 	instructionsOut(string);
 
 }
 
-int indxVars(int v){
-	if (v == -1)
-		return 7;
-	else if(v == -2)
-		return 6;
-	else
-		return v;
-}
-/*void whileOut(){
-	char string[100];
-	sprintf(string, "\n\t%s $t0, $t1, Exit%d", logicOp, loopCount);
-	instructionsOut(string);
-}*/
-
-void factorOutNum(int v){
-	char string[100];
-	sprintf(string, "\n\taddi $t%d, $zero, %d", varsCount%8, v);
-	instructionsOut(string);
-}
-void factorOutId(char *id, int v){
-	char string[100];
-	sprintf(string, "\n\tlw $t%d, %d($sp)", varsCount%8, stackIndex(id));
-	instructionsOut(string);
-}
-
+//ARITHMETICS
 void addOut(){
 	instructionsOut("#ADD");
 	char string[100];

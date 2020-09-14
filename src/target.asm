@@ -53,44 +53,54 @@ main:
 	
 	sub $t4, $t3, $t4
 	
+	addi $t5, $zero, 1
+	
+	lw $t6, 4($sp)
+	#ADD
+	
+	add $t6, $t6, $t5
+	#ADD
+	
+	add $t6, $t6, $t5
+	
 	#assign value
 	
-	sw $t4 8($sp)
+	sw $t6 8($sp)
 
 	While0:	
-	lw $t5, 12($sp)
+	lw $t7, 12($sp)
 	
-	addi $t6, $zero, 10
+	addi $t0, $zero, 10
 	
 
-	bgt $t5, $t6, Exit0
+	bgt $t7, $t0, Exit0
 	
 	#If statement
 	
-	lw $t7, 8($sp)
+	lw $t1, 8($sp)
 	
-	addi $t0, $zero, 1
+	addi $t2, $zero, 4
 	
 
-	bne $t0, $t7, Else0
+	bne $t2, $t1, Else0
 	
-	lw $t1, 8($sp)
+	lw $t3, 8($sp)
 	
 	#print
 	
 	lw $s0, 8($sp) 
 	jal printl
 	
-	lw $t2, 12($sp)
+	lw $t4, 12($sp)
 	
-	addi $t3, $zero, 1
+	addi $t5, $zero, 1
 	#ADD
 	
-	add $t3, $t3, $t2
+	add $t5, $t5, $t4
 	
 	#assign value
 	
-	sw $t3 12($sp)
+	sw $t5 12($sp)
 
 	j EndIf0
 	
@@ -104,52 +114,64 @@ main:
 
 Exit0:
 	
-	addi $t4, $zero, 3
+	addi $t6, $zero, 3
 	
-	lw $t5, 4($sp)
+	lw $t7, 4($sp)
 	#MULT
 	
-	mul $t5, $t5, $t4
+	mul $t7, $t7, $t6
 	
-	#assign value
-	
-	sw $t5 8($sp)
-	
-	addi $t6, $zero, 0
-	
-	#assign value
-	
-	sw $t6 12($sp)
-
-	While1:	
-	lw $t7, 12($sp)
-	
-	addi $t0, $zero, 10
-	
-
-	bgt $t7, $t0, Exit1
-	
-	lw $t1, 12($sp)
-	
-	addi $t2, $zero, 1
+	addi $t0, $zero, 1
 	#ADD
 	
-	add $t2, $t2, $t1
+	add $t0, $t0, $t7
+	
+	#assign value
+	
+	sw $t0 8($sp)
+	
+	lw $t1, 8($sp)
+	
+	#print
+	
+	lw $s0, 8($sp) 
+	jal printl
+	
+	addi $t2, $zero, 0
 	
 	#assign value
 	
 	sw $t2 12($sp)
+
+	While1:	
+	lw $t3, 12($sp)
+	
+	addi $t4, $zero, 10
+	
+
+	bgt $t3, $t4, Exit1
+	
+	lw $t5, 12($sp)
+	
+	addi $t6, $zero, 1
+	#ADD
+	
+	add $t6, $t6, $t5
+	
+	#assign value
+	
+	sw $t6 12($sp)
 	
 	#If statement
 	
-	lw $t3, 8($sp)
+	lw $t7, 8($sp)
 	
-	addi $t4, $zero, 6
+	addi $t0, $zero, 7
 	
 
-	bne $t4, $t3, Else1
+	bne $t0, $t7, Else1
 	
-	lw $t5, 12($sp)
+	lw $t1, 12($sp)
 	
 	#print
 	

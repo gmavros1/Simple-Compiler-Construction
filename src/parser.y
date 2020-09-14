@@ -68,7 +68,7 @@ STMT 				: ASSIGN_STMT
 						| COMP_STMT
 						| DECLARATION
 						| NULL_STMT
-						| T_PRINTLN '(' EXPR ')' ';' {printOut(ids);}
+						| T_PRINTLN '(' EXPR ')' ';' {printOut(ids);} //PRINT
 						;
 
 DECLARATION	: TYPE ID_LIST ';'
@@ -78,7 +78,7 @@ TYPE				: T_INT {char *s="int" ; type =  strdup(s);}
 						| T_FLOAT {char *s="flt" ; type =  strdup(s);}
 						;
 
-ID_LIST 		: T_ID { symlook(ids); declarationOut(ids); } ',' ID_LIST
+ID_LIST 		: T_ID { symlook(ids); declarationOut(ids); } ',' ID_LIST //DECLARE
 						| T_ID { symlook(ids); declarationOut(ids); }
 						;
 
@@ -97,20 +97,18 @@ ASSIGN_EXPR	: T_ID '=' EXPR	{	declarationCheck(ids);
 														  else	{
 																	$1->valueD = $3 ;
 															}
-															//assignOut($1->name, (int)($3+0.01));
-															assignOut($1->name);
-															//instructionsOut("mul $t7, $t7, $zero");
+															assignOut($1->name);							//ASSIGN
 														}
 						;
 
 EXPR				: ASSIGN_EXPR
 						| RVAL
 						;
-
+												//ASSIGN
 FOR_STMT 		: T_FOR '(' OPASSIGN_EXPR ';' { fprintf(targetOut,"\n\tWhile%d:", loopCount); }
-												OPBOOL_EXPR  { forBoolOut((int)(expr1), (int)(expr2)); } ';'
+												OPBOOL_EXPR  { forBoolOut((int)(expr1), (int)(expr2)); } ';'      //LOOPS
 												OPASSIGN_EXPR ')' STMT{	fprintf(targetOut, "\n\n\tj While%d\n", loopCount);
-																								fprintf(targetOut, "\n\nExit%d:\n", loopCount);
+												/*ASSIGN*/							fprintf(targetOut, "\n\nExit%d:\n", loopCount);
 																								loopCount++;}
 						;
 
@@ -123,7 +121,6 @@ OPBOOL_EXPR		: /* nothing */
 							;
 
 WHILE_STMT		: T_WHILE { fprintf(targetOut,"\n\tWhile%d:", loopCount); } '(' BOOL_EXPR ')' {	whileBoolOut((int)(expr1), (int)(expr2));
-																																															//whileO
 																																														}
 																																														STMT {	fprintf(targetOut, "\n\n\tj While%d\n", loopCount);
 																																														fprintf(targetOut, "\n\nExit%d:\n", loopCount);

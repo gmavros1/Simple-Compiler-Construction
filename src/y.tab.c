@@ -641,10 +641,10 @@ static const yytype_uint8 yyrline[] =
 {
        0,    54,    54,    57,    60,    61,    64,    65,    66,    67,
       68,    69,    70,    71,    74,    77,    78,    81,    81,    82,
-      85,    88,    91,   106,   107,   110,   111,   110,   117,   118,
-     121,   122,   125,   125,   125,   133,   134,   134,   133,   137,
-     138,   141,   144,   145,   146,   147,   148,   149,   152,   153,
-     154,   157,   158,   163,   166,   167,   168,   169
+      85,    88,    91,   104,   105,   108,   109,   108,   115,   116,
+     119,   120,   123,   123,   123,   130,   131,   131,   130,   134,
+     135,   138,   141,   142,   143,   144,   145,   146,   149,   150,
+     151,   154,   155,   160,   163,   164,   165,   166
 };
 #endif
 
@@ -1329,175 +1329,172 @@ yyreduce:
 														  else	{
 																	(yyvsp[-2].symp)->valueD = (yyvsp[0].dval) ;
 															}
-															//assignOut($1->name, (int)($3+0.01));
-															assignOut((yyvsp[-2].symp)->name);
-															//instructionsOut("mul $t7, $t7, $zero");
+															assignOut((yyvsp[-2].symp)->name);							//ASSIGN
 														}
-#line 1337 "y.tab.c"
+#line 1335 "y.tab.c"
     break;
 
   case 25: /* $@2: %empty  */
-#line 110 "parser.y"
+#line 108 "parser.y"
                                                       { fprintf(targetOut,"\n\tWhile%d:", loopCount); }
-#line 1343 "y.tab.c"
+#line 1341 "y.tab.c"
     break;
 
   case 26: /* $@3: %empty  */
-#line 111 "parser.y"
+#line 109 "parser.y"
                                                                                                              { forBoolOut((int)(expr1), (int)(expr2)); }
-#line 1349 "y.tab.c"
+#line 1347 "y.tab.c"
     break;
 
   case 27: /* FOR_STMT: T_FOR '(' OPASSIGN_EXPR ';' $@2 OPBOOL_EXPR $@3 ';' OPASSIGN_EXPR ')' STMT  */
-#line 112 "parser.y"
+#line 110 "parser.y"
                                                                                                                       {	fprintf(targetOut, "\n\n\tj While%d\n", loopCount);
-																								fprintf(targetOut, "\n\nExit%d:\n", loopCount);
+												/*ASSIGN*/							fprintf(targetOut, "\n\nExit%d:\n", loopCount);
 																								loopCount++;}
-#line 1357 "y.tab.c"
+#line 1355 "y.tab.c"
     break;
 
   case 32: /* $@4: %empty  */
-#line 125 "parser.y"
+#line 123 "parser.y"
                                   { fprintf(targetOut,"\n\tWhile%d:", loopCount); }
-#line 1363 "y.tab.c"
+#line 1361 "y.tab.c"
     break;
 
   case 33: /* $@5: %empty  */
-#line 125 "parser.y"
+#line 123 "parser.y"
                                                                                                       {	whileBoolOut((int)(expr1), (int)(expr2));
-																																															//whileO
 																																														}
-#line 1371 "y.tab.c"
+#line 1368 "y.tab.c"
     break;
 
   case 34: /* WHILE_STMT: T_WHILE $@4 '(' BOOL_EXPR ')' $@5 STMT  */
-#line 128 "parser.y"
+#line 125 "parser.y"
                                                                                                                                                                                                                                                                                                                                                                                      {	fprintf(targetOut, "\n\n\tj While%d\n", loopCount);
 																																														fprintf(targetOut, "\n\nExit%d:\n", loopCount);
 																																														loopCount++;}
-#line 1379 "y.tab.c"
+#line 1376 "y.tab.c"
     break;
 
   case 35: /* $@6: %empty  */
-#line 133 "parser.y"
+#line 130 "parser.y"
                                        {instructionsOut("\n\t#If statement");}
-#line 1385 "y.tab.c"
+#line 1382 "y.tab.c"
     break;
 
   case 36: /* $@7: %empty  */
-#line 134 "parser.y"
+#line 131 "parser.y"
                                                                                                   { ifBoolOut((int)(expr1), (int)(expr2)); }
-#line 1391 "y.tab.c"
+#line 1388 "y.tab.c"
     break;
 
   case 37: /* $@8: %empty  */
-#line 134 "parser.y"
+#line 131 "parser.y"
                                                                                                                                                   {fprintf(targetOut, "\n\tj EndIf%d\n", ifCount); elseOut();}
-#line 1397 "y.tab.c"
+#line 1394 "y.tab.c"
     break;
 
   case 38: /* IF_STMT: T_IF $@6 '(' BOOL_EXPR ')' $@7 STMT $@8 ELSE_PART  */
-#line 134 "parser.y"
+#line 131 "parser.y"
                                                                                                                                                                                                                          { endif(); ifCount++;}
-#line 1403 "y.tab.c"
+#line 1400 "y.tab.c"
     break;
 
   case 41: /* BOOL_EXPR: EXPR C_OP EXPR  */
-#line 141 "parser.y"
+#line 138 "parser.y"
                                                  {expr1 = (yyvsp[-2].dval); expr2 = (yyvsp[0].dval);}
-#line 1409 "y.tab.c"
+#line 1406 "y.tab.c"
     break;
 
   case 42: /* C_OP: T_EQUAL  */
-#line 144 "parser.y"
+#line 141 "parser.y"
                                                   { logicOp = strdup("bne"); }
-#line 1415 "y.tab.c"
+#line 1412 "y.tab.c"
     break;
 
   case 43: /* C_OP: '<'  */
-#line 145 "parser.y"
+#line 142 "parser.y"
                                                               { logicOp = strdup("bgt");}
-#line 1421 "y.tab.c"
+#line 1418 "y.tab.c"
     break;
 
   case 44: /* C_OP: '>'  */
-#line 146 "parser.y"
+#line 143 "parser.y"
                                                               { logicOp = strdup("blt");}
-#line 1427 "y.tab.c"
+#line 1424 "y.tab.c"
     break;
 
   case 45: /* C_OP: T_SMALLER  */
-#line 147 "parser.y"
+#line 144 "parser.y"
                                                                     { logicOp = strdup("bge");}
-#line 1433 "y.tab.c"
+#line 1430 "y.tab.c"
     break;
 
   case 46: /* C_OP: T_BIGGER  */
-#line 148 "parser.y"
+#line 145 "parser.y"
                                                                    { logicOp = strdup("ble");}
-#line 1439 "y.tab.c"
+#line 1436 "y.tab.c"
     break;
 
   case 47: /* C_OP: T_NOTEQUAL  */
-#line 149 "parser.y"
+#line 146 "parser.y"
                                                                      { logicOp = strdup("beq");}
-#line 1445 "y.tab.c"
+#line 1442 "y.tab.c"
     break;
 
   case 48: /* RVAL: RVAL '+' TERM  */
-#line 152 "parser.y"
+#line 149 "parser.y"
                                                         { (yyval.dval) = (yyvsp[-2].dval) + (yyvsp[0].dval); addOut(); }
-#line 1451 "y.tab.c"
+#line 1448 "y.tab.c"
     break;
 
   case 49: /* RVAL: RVAL '-' TERM  */
-#line 153 "parser.y"
+#line 150 "parser.y"
                                                                         { (yyval.dval) = (yyvsp[-2].dval) - (yyvsp[0].dval); substractOut(); }
-#line 1457 "y.tab.c"
+#line 1454 "y.tab.c"
     break;
 
   case 51: /* TERM: TERM '*' FACTOR  */
-#line 157 "parser.y"
+#line 154 "parser.y"
                                                           { (yyval.dval) = (yyvsp[-2].dval) * (yyvsp[0].dval); multOut(); }
-#line 1463 "y.tab.c"
+#line 1460 "y.tab.c"
     break;
 
   case 52: /* TERM: TERM '/' FACTOR  */
-#line 158 "parser.y"
+#line 155 "parser.y"
                                                                           { if ((yyvsp[0].dval) == 0)
 																		yyerror("divide by zero");
 							    								else
 																		(yyval.dval) = (yyvsp[-2].dval) / (yyvsp[0].dval); divOut();
 							 									}
-#line 1473 "y.tab.c"
+#line 1470 "y.tab.c"
     break;
 
   case 54: /* FACTOR: '(' EXPR ')'  */
-#line 166 "parser.y"
+#line 163 "parser.y"
                                                 { (yyval.dval) = (yyvsp[-1].dval); }
-#line 1479 "y.tab.c"
+#line 1476 "y.tab.c"
     break;
 
   case 55: /* FACTOR: '-' FACTOR  */
-#line 167 "parser.y"
+#line 164 "parser.y"
                                                                         { (yyval.dval) = -(yyvsp[0].dval); negative(); }
-#line 1485 "y.tab.c"
+#line 1482 "y.tab.c"
     break;
 
   case 56: /* FACTOR: T_ID  */
-#line 168 "parser.y"
+#line 165 "parser.y"
                                                                         { (yyval.dval) = (yyvsp[0].symp)->valueD; factorOutId((yyvsp[0].symp)->name, (int)((yyvsp[0].symp)->valueD)); varsCount++; }
-#line 1491 "y.tab.c"
+#line 1488 "y.tab.c"
     break;
 
   case 57: /* FACTOR: T_NUM  */
-#line 169 "parser.y"
+#line 166 "parser.y"
                                                                         { (yyval.dval) = (yyvsp[0].dval); factorOutNum((int)((yyvsp[0].dval))); varsCount++; }
-#line 1497 "y.tab.c"
+#line 1494 "y.tab.c"
     break;
 
 
-#line 1501 "y.tab.c"
+#line 1498 "y.tab.c"
 
       default: break;
     }
@@ -1691,7 +1688,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 170 "parser.y"
+#line 167 "parser.y"
 
 
 #include "asCodeGen.c"

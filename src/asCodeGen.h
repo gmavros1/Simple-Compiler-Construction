@@ -1,7 +1,6 @@
 void dataOut();
 void instructionsOut(char *s);
 void declarationOut(char *s);
-//void assignOut(char *s, int v);
 void assignOut(char *s);
 void printOut(char *s);
 void ifBoolOut();
