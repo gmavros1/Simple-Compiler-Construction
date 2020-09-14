@@ -78,8 +78,8 @@ TYPE				: T_INT {char *s="int" ; type =  strdup(s);}
 						| T_FLOAT {char *s="flt" ; type =  strdup(s);}
 						;
 
-ID_LIST 		: T_ID { symlook(ids); varsCount++; declarationOut(ids); } ',' ID_LIST
-						| T_ID { symlook(ids); varsCount++; declarationOut(ids); }
+ID_LIST 		: T_ID { symlook(ids); declarationOut(ids); } ',' ID_LIST
+						| T_ID { symlook(ids); declarationOut(ids); }
 						;
 
 NULL_STMT		: ';'
@@ -97,8 +97,9 @@ ASSIGN_EXPR	: T_ID '=' EXPR	{	declarationCheck(ids);
 														  else	{
 																	$1->valueD = $3 ;
 															}
-															assignOut($1->name, (int)($3+0.01));
-
+															//assignOut($1->name, (int)($3+0.01));
+															assignOut($1->name);
+															//instructionsOut("mul $t7, $t7, $zero");
 														}
 						;
 
@@ -106,7 +107,11 @@ EXPR				: ASSIGN_EXPR
 						| RVAL
 						;
 
-FOR_STMT 		: T_FOR '(' OPASSIGN_EXPR ';' OPBOOL_EXPR ';' OPASSIGN_EXPR ')' STMT
+FOR_STMT 		: T_FOR '(' OPASSIGN_EXPR ';' { fprintf(targetOut,"\n\tWhile%d:", loopCount); }
+												OPBOOL_EXPR  { forBoolOut((int)(expr1), (int)(expr2)); } ';'
+												OPASSIGN_EXPR ')' STMT{	fprintf(targetOut, "\n\n\tj While%d\n", loopCount);
+																								fprintf(targetOut, "\n\nExit%d:\n", loopCount);
+																								loopCount++;}
 						;
 
 OPASSIGN_EXPR	: /* nothing */
@@ -117,10 +122,16 @@ OPBOOL_EXPR		: /* nothing */
 							| BOOL_EXPR
 							;
 
-WHILE_STMT		: T_WHILE '(' BOOL_EXPR ')' {fprintf(targetOut, "\n\taddi $t0, $zero, %d\n\taddi $t1, $zero, %d",(int)(expr1), (int)(expr2)); fprintf(targetOut,"\n\tWhile%d:", loopCount); whileOut(); }  STMT {fprintf(targetOut, "\n\n\tj While%d\n", loopCount); fprintf(targetOut, "\n\nExit%d:\n", loopCount);  loopCount++;}
+WHILE_STMT		: T_WHILE { fprintf(targetOut,"\n\tWhile%d:", loopCount); } '(' BOOL_EXPR ')' {	whileBoolOut((int)(expr1), (int)(expr2));
+																																															//whileO
+																																														}
+																																														STMT {	fprintf(targetOut, "\n\n\tj While%d\n", loopCount);
+																																														fprintf(targetOut, "\n\nExit%d:\n", loopCount);
+																																														loopCount++;}
 							;
 
-IF_STMT				: T_IF '(' BOOL_EXPR ')' { ifOut((int)(expr1), (int)(expr2)); } STMT {fprintf(targetOut, "\n\tj EndIf%d\n", ifCount); elseOut();} ELSE_PART { endif(); ifCount++;}
+IF_STMT				: T_IF {instructionsOut("\n\t#If statement");}
+										'(' BOOL_EXPR ')' { ifBoolOut((int)(expr1), (int)(expr2)); } STMT {fprintf(targetOut, "\n\tj EndIf%d\n", ifCount); elseOut();} ELSE_PART { endif(); ifCount++;}
 							;
 
 ELSE_PART			: /* nothing */
@@ -138,24 +149,24 @@ C_OP					: T_EQUAL { logicOp = strdup("bne"); }
 							| T_NOTEQUAL { logicOp = strdup("beq");}
 							;
 
-RVAL					: RVAL '+' TERM	{ $$ = $1 + $3; }
-							| RVAL '-' TERM	{ $$ = $1 - $3; }
+RVAL					: RVAL '+' TERM	{ $$ = $1 + $3; addOut(); }
+							| RVAL '-' TERM	{ $$ = $1 - $3; substractOut(); }
 							| TERM
 							;
 
-TERM					: TERM '*' FACTOR { $$ = $1 * $3; }
+TERM					: TERM '*' FACTOR { $$ = $1 * $3; multOut(); }
 	 						| TERM '/' FACTOR { if ($3 == 0)
 																		yyerror("divide by zero");
 							    								else
-																		$$ = $1 / $3;
+																		$$ = $1 / $3; divOut();
 							 									}
 				 			| FACTOR
 				 			;
 
 FACTOR				: '(' EXPR ')' 	{ $$ = $2; }
-							| '-' FACTOR   	{ $$ = -$2; }
-							| T_ID		{ $$ = $1->valueD; }
-							| T_NUM		{ $$ = $1; }
+							| '-' FACTOR   	{ $$ = -$2; negative(); }
+							| T_ID		{ $$ = $1->valueD; factorOutId($1->name, (int)($1->valueD)); varsCount++; }
+							| T_NUM		{ $$ = $1; factorOutNum((int)($1)); varsCount++; }
 %%
 
 #include "asCodeGen.c"
