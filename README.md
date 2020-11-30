@@ -1,2 +1,2 @@
 # Compile-Construction-flex
-A simple C like compiler builed with c-tools
+A simple C like compiler build with c-tools
