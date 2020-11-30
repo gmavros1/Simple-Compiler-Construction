@@ -1,2 +1,2 @@
 # Compile-Construction-flex
-C like compiler builed with flex and love
+A simple C like compiler builed with c-tools
